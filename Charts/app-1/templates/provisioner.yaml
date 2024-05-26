@@ -1,0 +1,32 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: {{ .Release.Name }}-karpenter
+spec:
+  ttlSecondsAfterEmpty: 60 # scale down nodes after 60 seconds without workloads (excluding daemons)
+  ttlSecondsUntilExpired: 604800 # expire nodes after 7 days (in seconds) = 7 * 60 * 60 * 24
+  limits:
+    resources:
+      cpu: 100 # limit to 100 CPU cores
+  requirements:
+    # Include general purpose instance families
+    - key: karpenter.k8s.aws/instance-family
+      operator: In
+      values: [t2, t3]
+    - key: karpenter.k8s.aws/instance-size
+      operator: In
+      values: [medium] # Include medium and large instance sizes
+  provider:
+    subnetSelector:
+      Name: "karpenter"
+    securityGroupSelector:
+      kubernetes.io/cluster/cloud4devs: owned
+      scale:
+    down:
+      idle: 1m
+    up:
+      resources:
+        cpu: 100
+      replicas: 
+        minimum: 1
+        maximum: 5

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-serviceteste
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-serviceteste
+    spec:
+      containers:
+      - name: devops-teste
+        image: {{ .Values.app.image }}
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: {{ .Values.app.resources.requests.cpu }}
+            memory: {{ .Values.app.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.app.resources.limits.cpu }}
+            memory: {{ .Values.app.resources.limits.memory }}
+

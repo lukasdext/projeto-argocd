@@ -1,0 +1,51 @@
+# values.yaml
+replicaCount: 2
+
+teste:
+  image: jwilder/whoami
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+image:
+  repository: jwilder/whoami
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 8000
+
+# ingress:
+#   enabled: true
+#   annotations: 
+#     kubernetes.io/ingress.class: "nginx"
+#     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+#     nginx.ingress.kubernetes.io/app-root: "/"
+#     nginx.ingress.kubernetes.io/proxy-body-size: 100M
+#   hosts:
+#     - host: argocd.king.com
+#       paths:
+#         - pathType: Prefix
+#           path: "/"
+#   tls:
+#     - hosts:
+#         - argocd.king.com
+#       secretName: argocd-tls-secret
+
+# metricsServer:
+#   enabled: true
+#   replicaCount: 1
+#   image:
+#     repository: k8s.gcr.io/metrics-server/metrics-server
+#     tag: v0.5.0
+#     pullPolicy: IfNotPresent
+#   args:
+#     - --kubelet-insecure-tls
+#     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+
+

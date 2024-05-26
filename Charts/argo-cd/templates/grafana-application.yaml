@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1  # A versão da API do Argo CD para o recurso Application
+kind: Application  # O tipo de recurso que está sendo definido, neste caso, uma Application
+metadata:
+  name: grafana  # Nome da aplicação dentro do Argo CD
+  namespace: argocd  # Namespace onde a aplicação será gerenciada pelo Argo CD
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  # Finalizador usado para garantir a limpeza de recursos quando a aplicação é deletada
+
+spec:
+  destination:
+    namespace: monitoring  # O namespace de destino onde os recursos serão implantados
+    server: https://kubernetes.default.svc  # URL do servidor Kubernetes onde os recursos serão implantados
+  project: default  # O projeto Argo CD ao qual esta aplicação pertence
+
+  sources:  # Lista de fontes de configuração para a aplicação
+  # - repoURL:  https://github.com/<git-username>/<git-repo>.git  # URL do repositório Git que contém os recursos de configuração
+  #   targetRevision: HEAD  # A revisão do repositório que será usada (neste caso, a última commit na branch principal)
+  #   ref: <customizable reference>  # Referência personalizável para apontar para um subconjunto específico dentro do repositório
+  - repoURL: https://grafana.github.io/helm-charts  # URL do repositório Helm para o chart do Grafana
+    chart: grafana  # O nome do chart Helm a ser implantado
+    targetRevision: 6.52.2  # A versão específica do chart Helm a ser usada
+    helm:
+      values: |  # Valores personalizados para o chart Helm
+        service:
+          type: LoadBalancer  # Configura o serviço Grafana para usar um LoadBalancer
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Prometheus  # Define um datasource do Prometheus
+                type: prometheus
+                url: http://prometheus-server.monitoring.svc.cluster.local  # URL para alcançar o serviço Prometheus
+                access: proxy
+                isDefault: true
+              - name: loki  # Define um datasource do Loki
+                type: loki
+                url: http://loki.monitoring.svc.cluster.local
+                access: proxy
+        dashboardProviders:
+          dashboardproviders.yaml:
+            apiVersion: 1
+            providers:
+              - name: "default"
+                orgId: 1
+                folder: ""
+                type: file
+                disableDeletion: false
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards/default  # Caminho onde os dashboards são armazenados
+        dashboards:
+          default:
+            kubernetes:
+              gnetId: 10000  # ID do dashboard no Grafana.net
+              revision: 1
+              datasource: Prometheus  # Especifica o datasource padrão para os dashboards
+
+  syncPolicy:
+    automated:  # Política de sincronização automática
+      prune: true  # Habilita a poda de recursos não declarados na fonte de configuração
+      selfHeal: true  # Habilita a autocura para tentar corrigir divergências de estado automaticamente
+    syncOptions:
+    - CreateNamespace=true  # Opção de sincronização para criar o namespace se ele não existir

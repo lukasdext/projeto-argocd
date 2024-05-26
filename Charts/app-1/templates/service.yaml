@@ -1,0 +1,12 @@
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-lb-service
+spec:
+  selector:
+    app: {{ .Release.Name }}-serviceteste
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: LoadBalancer

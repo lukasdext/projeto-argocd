@@ -1,0 +1,4 @@
+apiVersion: v2
+name: grafana-prometheus
+description: A Helm chart for Grafana and Prometheus
+version: 0.1.0

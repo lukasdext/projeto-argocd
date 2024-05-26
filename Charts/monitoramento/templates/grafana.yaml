@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-grafana
+  labels:
+    app: {{ .Values.grafana.name | default "grafana" }}
+spec:
+  replicas: {{ .Values.grafana.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.grafana.name | default "grafana" }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.grafana.name | default "grafana" }}
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+      volumes:  #montando um volume chamado "grafana-storage" no caminho "/var/lib/grafana" dentro do contêiner. Este volume é um volume vazio, o que significa que os dados armazenados nele serão perdidos quando o pod for excluído.
+        - name: grafana-storage
+          emptyDir: {}

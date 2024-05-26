@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metrics-server
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 6.2.6
+    chart: metrics-server
+    helm:
+      releaseName: metrics-server
+      values: |
+        apiService:
+          create: true
+        global:
+          imageRegistry: public.ecr.aws
+        pdb:
+          create: true
+          minAvailable: 2
+        replicas: 1
+        extraArgs:           
+          - --kubelet-insecure-tls=true
+          - --kubelet-preferred-address-types=InternalIP
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true

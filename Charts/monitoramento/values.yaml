@@ -1,0 +1,30 @@
+grafana:
+  replicaCount: 1
+  image:
+    repository: grafana/grafana
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+    selector:
+      app: grafana
+
+
+
+prometheus:
+  enabled: true
+  image:
+    repository: prom/prometheus
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    name: prometheus
+    type: LoadBalancer
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  selector:
+    app: prometheus

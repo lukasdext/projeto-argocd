@@ -1,0 +1,25 @@
+# values.yaml
+replicaCount: 2
+
+app:
+  image: jwilder/whoami
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+image:
+  repository: jwilder/whoami
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 8000
+
+
+
+
